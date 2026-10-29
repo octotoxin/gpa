@@ -42,7 +42,10 @@
       min-height: 100%;
     }
 
-    body { margin: 0; }
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
 
     button, input { font-family: inherit; }
 
@@ -64,6 +67,151 @@
     .squircle-xs { border-radius: var(--radius-xs); }
 
     [hidden] { display: none !important; }
+
+    #app { min-height: 100dvh; }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1600px;
+      height: 100dvh;
+      margin-inline: auto;
+      padding-top: env(safe-area-inset-top);
+      padding-inline: clamp(1rem, 2.6vw, 2.5rem);
+      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header { flex-shrink: 0; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(20rem, 25rem) minmax(0, 1fr);
+      gap: clamp(1rem, 1.8vw, 1.5rem);
+      flex: 1;
+      min-height: 0;
+      margin-top: clamp(1.25rem, 2.6vw, 2.25rem);
+    }
+
+    .stats-panel {
+      background: #121212;
+      border: 1px solid var(--line);
+      padding: clamp(1.4rem, 2.4vw, 2.35rem);
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stats-panel::-webkit-scrollbar { display: none; }
+
+    .stat-block {
+      border-bottom: 1px solid var(--line);
+      padding: clamp(1rem, 2.3vh, 1.65rem) 0 clamp(1.15rem, 2.6vh, 1.8rem);
+    }
+
+    .stat-block:first-child { padding-top: 0.35rem; }
+
+    .stat-number {
+      font-weight: 300;
+      font-size: clamp(3.7rem, 5.4vw, 5.5rem);
+      letter-spacing: -0.065em;
+      line-height: 0.95;
+      font-variant-numeric: tabular-nums;
+      margin-top: 0.45rem;
+      white-space: nowrap;
+    }
+
+    .stat-number--small { font-size: clamp(3.1rem, 4.2vw, 4.35rem); }
+
+    .stats-footer {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .scale-note {
+      color: var(--faint);
+      font-size: 0.78rem;
+      line-height: 1.6;
+    }
+
+    .course-scroll {
+      background: #101010;
+      border: 1px solid var(--line);
+      min-width: 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      scrollbar-width: thin;
+      scrollbar-color: #484848 transparent;
+    }
+
+    .course-scroll:focus-visible {
+      outline: 2px solid #f3f3f3;
+      outline-offset: 2px;
+    }
+
+    .course-scroll::-webkit-scrollbar { width: 10px; }
+
+    .course-scroll::-webkit-scrollbar-track { background: transparent; }
+
+    .course-scroll::-webkit-scrollbar-thumb {
+      background: #484848;
+      border: 2px solid #101010;
+      border-radius: 999px;
+    }
+
+    .course-scroll-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .course-list { min-width: 0; }
+
+    .course-controls {
+      display: grid;
+      grid-template-columns: 7rem minmax(0, 1.4fr) minmax(13rem, 0.9fr);
+      gap: 1rem;
+      align-items: start;
+      margin-top: 1.1rem;
+    }
+
+    .control-group { min-width: 0; }
+
+    .grade-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .mode-switch { display: flex; gap: 0.4rem; }
+
+    .grade-input { margin-top: 0.8rem; }
+
+    .letter-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 0.45rem;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .score-row .field { max-width: 13rem; }
 
     .field {
       background: var(--surface);
@@ -104,6 +252,23 @@
       color: var(--invert-text);
     }
 
+    .letter {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      min-height: 2.55rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .letter:hover { background: var(--surface-2); color: var(--text); }
+
+    .letter.is-on {
+      background: var(--invert);
+      border-color: var(--invert);
+      color: var(--invert-text);
+    }
+
     .icon-btn {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -116,6 +281,24 @@
     }
 
     .icon-btn:hover { color: var(--text); background: var(--surface-2); }
+
+    .add-btn {
+      background: transparent;
+      border: 1px dashed #3d3d3d;
+      color: var(--muted);
+      width: 100%;
+      min-height: 4.4rem;
+      padding: 0.95rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .add-btn:hover {
+      background: var(--surface);
+      border-color: #5c5c5c;
+      color: var(--text);
+    }
 
     .ghost {
       background: transparent;
@@ -151,120 +334,6 @@
 
     .status-dot.is-live { background: #7ad39b; }
 
-    /* ---------- layout shell ---------- */
-    .app-shell {
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    @media (max-width: 1023px) {
-      .app-shell { height: auto; min-height: 100dvh; overflow: visible; }
-    }
-
-    .panel {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-    }
-
-    .scroll-area {
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      scrollbar-width: thin;
-      scrollbar-color: #3d3d3d transparent;
-    }
-
-    .scroll-area::-webkit-scrollbar { width: 10px; }
-
-    .scroll-area::-webkit-scrollbar-track { background: transparent; }
-
-    .scroll-area::-webkit-scrollbar-thumb {
-      background: #3d3d3d;
-      border-radius: 999px;
-      border: 3px solid transparent;
-      background-clip: content-box;
-    }
-
-    .scroll-area::-webkit-scrollbar-thumb:hover { background: #4f4f4f; background-clip: content-box; }
-
-    @media (max-width: 1023px) {
-      .scroll-area { overflow: visible; }
-    }
-
-    /* ---------- stats panel ---------- */
-    .stat-panel { display: flex; flex-direction: column; }
-
-    .stat-row {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 1.45rem 1.6rem;
-      min-height: 6rem;
-    }
-
-    .stat-row + .stat-row { border-top: 1px solid var(--line); }
-
-    .stat-num {
-      font-weight: 300;
-      letter-spacing: -0.05em;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-      font-size: clamp(2.5rem, 4.2vw, 3.35rem);
-    }
-
-    @media (max-width: 1023px) {
-      .stat-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .stat-row { min-height: 0; padding: 1.05rem 1.15rem; border-top: 0 !important; }
-      .stat-row:nth-child(odd) { border-right: 1px solid var(--line); }
-      .stat-row:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
-      .stat-num { font-size: 2.15rem; }
-    }
-
-    /* ---------- controls ---------- */
-    select.field {
-      appearance: none;
-      -webkit-appearance: none;
-      padding-right: 2.4rem;
-      cursor: pointer;
-    }
-
-    select.field option { background: #141414; color: var(--text); }
-
-    .mini-seg {
-      background: var(--surface-2);
-      border: 1px solid var(--line);
-      color: var(--faint);
-      padding: 0.18rem 0.55rem;
-      font-size: 0.62rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      line-height: 1.4;
-    }
-
-    .mini-seg:hover { color: var(--text); }
-
-    .mini-seg.is-on {
-      background: var(--invert);
-      border-color: var(--invert);
-      color: var(--invert-text);
-    }
-
-    .add-btn {
-      background: transparent;
-      border: 1px dashed var(--line);
-      color: var(--muted);
-      width: 100%;
-      padding: 1rem;
-      font-size: 0.9rem;
-      font-weight: 400;
-    }
-
-    .add-btn:hover { color: var(--text); border-color: #3d3d3d; background: var(--surface); }
-
     .course {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -282,6 +351,67 @@
     .stat-val {
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.03em;
+    }
+
+    @media (max-width: 1180px) {
+      .course-controls { grid-template-columns: 7rem minmax(0, 1fr); }
+
+      .course-grade-control { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+
+      .app-shell {
+        height: auto;
+        min-height: 100dvh;
+      }
+
+      .workspace { grid-template-columns: 1fr; }
+
+      .stats-panel { overflow: visible; }
+
+      .stats-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 1.5rem;
+      }
+
+      .stat-block { padding: 1rem 0 1.15rem; }
+
+      .stat-block:nth-child(-n + 2) { padding-top: 0.25rem; }
+
+      .stat-number { font-size: clamp(2.8rem, 11vw, 4rem); }
+
+      .stats-footer { margin-top: 1rem; }
+
+      .course-scroll { height: min(68dvh, 56rem); }
+    }
+
+    @media (max-width: 620px) {
+      .course-controls { grid-template-columns: 6.5rem minmax(0, 1fr); }
+
+      .letter-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+      .course-scroll-inner { padding: 0.85rem; }
+
+      .course { padding: 1rem; }
+    }
+
+    @media (max-width: 460px) {
+      .workspace { margin-top: 1rem; }
+
+      .stats-panel { padding: 1.15rem; }
+
+      .stat-number { font-size: 2.65rem; }
+
+      .course-controls { grid-template-columns: 1fr; }
+
+      .course-grade-control { grid-column: auto; }
+
+      .letter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+      .save-btn { padding-inline: 0.85rem; }
     }
 
     ::selection {
@@ -342,18 +472,6 @@
 
     function uid() {
       return Math.random().toString(36).slice(2, 9);
-    }
-
-    function chevronDown() {
-      const node = el("span", {
-        class: "pointer-events-none absolute right-3.5 bottom-[0.72rem] text-[#8a8a8a]",
-        "aria-hidden": "true"
-      });
-      node.innerHTML =
-        '<svg width="10" height="6" viewBox="0 0 10 6" fill="none">' +
-        '<path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" ' +
-        'stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      return node;
     }
 
     function createCourse() {
@@ -517,7 +635,7 @@
       }
     }
 
-    class StatsPanel extends Component {
+    class GpaHero extends Component {
       constructor(store) {
         super();
         this.store = store;
@@ -525,22 +643,35 @@
       }
 
       render() {
-        this.weightedEl = el("div", { class: "stat-num" }, "—");
-        this.unweightedEl = el("div", { class: "stat-num" }, "—");
-        this.coursesEl = el("div", { class: "stat-num" }, "0");
-        this.creditsEl = el("div", { class: "stat-num" }, "0");
+        this.valueEl = el("div", { class: "stat-number" }, "—");
+        this.unweightedEl = el("div", { class: "stat-number" }, "—");
+        this.coursesEl = el("div", { class: "stat-number stat-number--small" }, "0");
+        this.creditsEl = el("div", { class: "stat-number stat-number--small" }, "0");
 
-        const row = (label, node) =>
-          el("div", { class: "stat-row" }, [
-            el("div", { class: "label mb-2" }, label),
+        const stat = (label, node) =>
+          el("div", { class: "stat-block" }, [
+            el("div", { class: "label" }, label),
             node
           ]);
 
-        this.root = el("aside", { class: "panel stat-panel lg:h-full" }, [
-          row("weighted gpa", this.weightedEl),
-          row("unweighted gpa", this.unweightedEl),
-          row("courses", this.coursesEl),
-          row("credits", this.creditsEl)
+        this.root = el("aside", { class: "stats-panel squircle", "aria-label": "GPA summary" }, [
+          el("div", { class: "stats-list" }, [
+            stat("Weighted GPA", this.valueEl),
+            stat("Unweighted GPA", this.unweightedEl),
+            stat("Courses", this.coursesEl),
+            stat("Credits", this.creditsEl)
+          ]),
+          el("div", { class: "stats-footer" }, [
+            el("div", { class: "scale-note" }, [
+              el("div", {}, "On Level · Honors — 4.0"),
+              el("div", {}, "AP · IB — 5.0")
+            ]),
+            el("button", {
+              type: "button",
+              class: "ghost squircle-sm px-3 py-2",
+              onClick: () => this.store.reset()
+            }, "Reset")
+          ])
         ]);
 
         this.refresh();
@@ -548,9 +679,9 @@
       }
 
       refresh() {
-        if (!this.weightedEl) return;
+        if (!this.valueEl) return;
         const { weighted, unweighted, credits, counted } = GPA.compute(this.store.courses);
-        this.weightedEl.textContent = GPA.fmt(weighted);
+        this.valueEl.textContent = GPA.fmt(weighted);
         this.unweightedEl.textContent = GPA.fmt(unweighted);
         this.coursesEl.textContent = String(counted);
         this.creditsEl.textContent = credits ? String(Number(credits.toFixed(2))) : "0";
@@ -582,7 +713,7 @@
         });
 
         this.creditInput = el("input", {
-          class: "field squircle-sm text-center",
+          class: "field squircle-sm w-full text-center",
           type: "number",
           min: "0",
           max: "10",
@@ -603,24 +734,27 @@
 
         this.modeLetterBtn = el("button", {
           type: "button",
-          class: "mini-seg squircle-xs",
+          class: "seg squircle-xs flex-1 py-2 text-[0.78rem] font-medium",
           onClick: () => this.patch({ mode: "letter" })
         }, "Letter");
 
         this.modeScoreBtn = el("button", {
           type: "button",
-          class: "mini-seg squircle-xs",
+          class: "seg squircle-xs flex-1 py-2 text-[0.78rem] font-medium",
           onClick: () => this.patch({ mode: "score" })
-        }, "Score");
+        }, "Score / 100");
 
-        this.gradeSelect = el("select", {
-          class: "field squircle-sm",
-          "aria-label": "Letter grade",
-          onChange: (e) => this.patch({ letter: e.target.value, mode: "letter" })
-        }, LETTERS.map((letter) => el("option", { value: letter }, letter)));
+        this.letterBtns = LETTERS.map((letter) =>
+          el("button", {
+            type: "button",
+            class: "letter squircle-xs",
+            dataset: { letter },
+            onClick: () => this.patch({ letter, mode: "letter" })
+          }, letter)
+        );
 
         this.scoreInput = el("input", {
-          class: "field squircle-sm text-center",
+          class: "field squircle-sm text-center text-lg font-light tracking-tight",
           type: "number",
           min: "0",
           max: "100",
@@ -634,23 +768,14 @@
         this.letterHint = el("span", { class: "text-[#8a8a8a] text-sm" }, "");
         this.pointsEl = el("span", { class: "stat-val text-sm text-[#8a8a8a]" }, "");
 
-        this.gradeField = el("div", { class: "relative" }, [this.gradeSelect, chevronDown()]);
-        this.scoreField = el("div", {}, [
+        this.letterWrap = el("div", { class: "letter-grid" }, this.letterBtns);
+        this.scoreWrap = el("div", { class: "score-row" }, [
           this.scoreInput,
-          el("div", { class: "flex items-center gap-1.5 mt-1.5" }, [
-            el("span", { class: "label" }, "letter"),
-            el("span", { class: "text-sm text-[#8a8a8a]" }, this.letterHint)
+          el("div", { class: "shrink-0" }, [
+            el("div", { class: "label" }, "letter"),
+            this.letterHint
           ])
         ]);
-
-        const cell = (label, extra, node, cls) =>
-          el("div", { class: cls || "" }, [
-            el("div", { class: "flex items-center justify-between gap-2 mb-1.5 min-h-[1.1rem]" }, [
-              el("div", { class: "label" }, label),
-              extra || null
-            ]),
-            node
-          ]);
 
         this.root = el("article", { class: "course squircle" }, [
           el("div", { class: "flex gap-2 items-center" }, [
@@ -662,19 +787,30 @@
               onClick: () => this.store.remove(this.course.id)
             }, "×")
           ]),
-          el("div", { class: "mt-4 flex flex-wrap gap-x-4 gap-y-4 items-end" }, [
-            el("div", { class: "basis-[4.5rem] grow-0" }, [
+          el("div", { class: "course-controls" }, [
+            el("div", { class: "control-group" }, [
               el("div", { class: "label mb-1.5" }, "Credits"),
               this.creditInput
             ]),
-            el("div", { class: "basis-[15rem] grow" }, [
+            el("div", { class: "control-group" }, [
               el("div", { class: "label mb-1.5" }, "Type"),
               el("div", { class: "flex gap-1.5" }, this.typeBtns)
             ]),
-            cell("Grade", el("div", { class: "flex gap-1" }, [this.modeLetterBtn, this.modeScoreBtn]),
-              el("div", {}, [this.gradeField, this.scoreField]), "basis-[10rem] grow-0")
+            el("div", { class: "control-group course-grade-control" }, [
+              el("div", { class: "grade-heading" }, [
+                el("div", { class: "label" }, "Grade"),
+                this.pointsEl
+              ]),
+              el("div", { class: "mode-switch" }, [
+                this.modeLetterBtn,
+                this.modeScoreBtn
+              ])
+            ])
           ]),
-          el("div", { class: "mt-3 flex justify-end" }, this.pointsEl)
+          el("div", { class: "grade-input" }, [
+            this.letterWrap,
+            this.scoreWrap
+          ])
         ]);
 
         this.sync();
@@ -686,9 +822,9 @@
         this.typeBtns.forEach((btn) => btn.classList.toggle("is-on", btn.dataset.type === c.type));
         this.modeLetterBtn.classList.toggle("is-on", c.mode === "letter");
         this.modeScoreBtn.classList.toggle("is-on", c.mode === "score");
-        this.gradeField.hidden = c.mode !== "letter";
-        this.scoreField.hidden = c.mode !== "score";
-        if (document.activeElement !== this.gradeSelect) this.gradeSelect.value = c.letter || "A";
+        this.letterBtns.forEach((btn) => btn.classList.toggle("is-on", c.mode === "letter" && btn.dataset.letter === c.letter));
+        this.letterWrap.hidden = c.mode !== "letter";
+        this.scoreWrap.hidden = c.mode !== "score";
 
         const letter = letterFromCourse(c);
         const pts = pointsFor(c);
@@ -706,16 +842,16 @@
         super();
         this.store = store;
         this.items = new Map();
-        this.ready = false;
+        this.hasMounted = false;
         this.store.subscribe(() => this.sync());
       }
 
       render() {
         this.listEl = el("div", { class: "flex flex-col gap-3" });
         this.emptyEl = el("p", { class: "text-center text-[#8a8a8a] text-sm py-6" }, "No courses yet.");
-        this.root = el("section", {}, [this.listEl, this.emptyEl]);
+        this.root = el("section", { class: "course-list", "aria-label": "Courses" }, [this.listEl, this.emptyEl]);
         this.sync();
-        this.ready = true;
+        this.hasMounted = true;
         return this.root;
       }
 
@@ -730,21 +866,25 @@
           }
         }
 
-        let lastAdded = null;
+        let addedItem = null;
+
         for (const course of this.store.courses) {
           if (!this.items.has(course.id)) {
             const item = new CourseItem(course, this.store);
             item.mount(this.listEl);
             this.items.set(course.id, item);
-            lastAdded = item;
+            addedItem = item;
           }
         }
 
-        if (lastAdded && this.ready) {
-          lastAdded.root.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }
-
         this.emptyEl.hidden = this.store.courses.length > 0;
+
+        if (addedItem && this.hasMounted) {
+          requestAnimationFrame(() => {
+            const scroller = this.root.closest(".course-scroll");
+            if (scroller) scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
+          });
+        }
       }
     }
 
@@ -803,17 +943,23 @@
       }
 
       render() {
-        this.statusEl = el("span", { class: "text-[0.74rem] tracking-[0.06em] text-[#8a8a8a] truncate" }, "");
+        this.statusEl = el("span", { class: "text-[0.74rem] tracking-[0.06em] text-[#8a8a8a]" }, "");
         this.dot = el("span", { class: "status-dot" });
         this.saveBtn = el("button", {
           type: "button",
-          class: "save-btn squircle-sm whitespace-nowrap",
+          class: "save-btn squircle-sm",
           onClick: () => this.save()
         }, "Save classes");
 
-        this.root = el("div", { class: "flex items-center gap-2 min-w-0" }, [
-          this.dot,
-          this.statusEl
+        this.root = el("div", { class: "app-header flex items-center justify-between gap-4 pt-7" }, [
+          el("div", { class: "min-w-0" }, [
+            el("div", { class: "label mb-1" }, "GPA Calculator"),
+            el("div", { class: "flex items-center gap-2 min-w-0" }, [
+              this.dot,
+              el("span", { class: "truncate" }, this.statusEl)
+            ])
+          ]),
+          this.saveBtn
         ]);
 
         this.renderStatus();
@@ -832,55 +978,32 @@
 
       render() {
         const saveBar = new SaveBar(this.store);
-        const stats = new StatsPanel(this.store);
+        const stats = new GpaHero(this.store);
         const list = new CourseList(this.store);
-
-        saveBar.render();
 
         const add = el("button", {
           type: "button",
-          class: "add-btn squircle mt-4",
+          class: "add-btn squircle",
           onClick: () => this.store.add()
         }, "+  Add course");
 
-        const reset = el("button", {
-          type: "button",
-          class: "ghost squircle-sm px-3 py-2 whitespace-nowrap",
-          onClick: () => this.store.reset()
-        }, "Reset");
-
-        const topBar = el("header", {
-          class: "flex items-center justify-between gap-4 px-5 lg:px-6 pt-5 lg:pt-6 pb-4",
-          style: { paddingTop: "max(1.25rem, env(safe-area-inset-top))" }
+        const coursePanel = el("section", {
+          class: "course-scroll squircle",
+          tabindex: "0",
+          "aria-label": "Course details"
         }, [
-          el("div", { class: "min-w-0" }, [
-            el("div", { class: "label mb-1" }, "GPA Calculator"),
-            saveBar.root
-          ]),
-          el("div", { class: "flex items-center gap-1 shrink-0" }, [
-            reset,
-            saveBar.saveBtn
-          ])
-        ]);
-
-        const columns = el("div", {
-          class: "flex-1 min-h-0 grid gap-4 px-5 lg:px-6 lg:grid-cols-[19.5rem_minmax(0,1fr)]"
-        }, [
-          stats.render(),
-          el("section", { class: "scroll-area min-h-0 -mr-2 pr-2 lg:-mr-3 lg:pr-3" }, [
+          el("div", { class: "course-scroll-inner" }, [
             list.render(),
-            add,
-            el("p", { class: "text-center text-[0.72rem] text-[#5c5c5c] leading-relaxed mt-6" },
-              "On Level and Honors use a 4.0 scale. AP and IB use a 5.0 scale. A and A+ both cap at the scale maximum.")
+            add
           ])
         ]);
 
-        this.root = el("div", { class: "app-shell" }, [
-          topBar,
-          el("div", {
-            class: "flex-1 min-h-0",
-            style: { paddingBottom: "env(safe-area-inset-bottom)" }
-          }, columns)
+        this.root = el("main", { class: "app-shell" }, [
+          saveBar.render(),
+          el("div", { class: "workspace" }, [
+            stats.render(),
+            coursePanel
+          ])
         ]);
 
         return this.root;
