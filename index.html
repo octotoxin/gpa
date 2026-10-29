@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GPA Calculator</title>
+  <meta name="description" content="A minimal, offline-capable weighted GPA calculator for On Level, Honors, AP and IB courses." />
+  <meta name="theme-color" content="#0b0b0b" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="GPA" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0b0b;
+      --surface: #141414;
+      --surface-2: #1c1c1c;
+      --line: #2a2a2a;
+      --text: #f3f3f3;
+      --muted: #8a8a8a;
+      --faint: #5c5c5c;
+      --invert: #f3f3f3;
+      --invert-text: #0b0b0b;
+      --radius: 18px;
+      --radius-sm: 14px;
+      --radius-xs: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Outfit", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100%;
+    }
+
+    body { margin: 0; }
+
+    button, input { font-family: inherit; }
+
+    button {
+      appearance: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid #f3f3f3;
+      outline-offset: 2px;
+    }
+
+    .squircle { border-radius: var(--radius); }
+    .squircle-sm { border-radius: var(--radius-sm); }
+    .squircle-xs { border-radius: var(--radius-xs); }
+
+    [hidden] { display: none !important; }
+
+    .field {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      padding: 0.7rem 0.9rem;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+
+    .field::placeholder { color: var(--faint); }
+
+    .field:focus {
+      outline: none;
+      border-color: #555;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] { -moz-appearance: textfield; }
+
+    .seg {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .seg:hover { background: var(--surface-2); color: var(--text); }
+
+    .seg.is-on {
+      background: var(--invert);
+      border-color: var(--invert);
+      color: var(--invert-text);
+    }
+
+    .icon-btn {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      width: 2.6rem;
+      height: 2.6rem;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover { color: var(--text); background: var(--surface-2); }
+
+    .ghost {
+      background: transparent;
+      border: 0;
+      color: var(--faint);
+      font-size: 0.8rem;
+    }
+
+    .ghost:hover { color: var(--text); }
+
+    .save-btn {
+      background: var(--invert);
+      border: 1px solid var(--invert);
+      color: var(--invert-text);
+      padding: 0.62rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .save-btn:hover { background: #ffffff; border-color: #ffffff; }
+
+    .save-btn.is-saved { background: var(--surface-2); color: var(--text); border-color: var(--line); }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--faint);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .status-dot.is-live { background: #7ad39b; }
+
+    /* ---------- layout shell ---------- */
+    .app-shell {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1023px) {
+      .app-shell { height: auto; min-height: 100dvh; overflow: visible; }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+    }
+
+    .scroll-area {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: #3d3d3d transparent;
+    }
+
+    .scroll-area::-webkit-scrollbar { width: 10px; }
+
+    .scroll-area::-webkit-scrollbar-track { background: transparent; }
+
+    .scroll-area::-webkit-scrollbar-thumb {
+      background: #3d3d3d;
+      border-radius: 999px;
+      border: 3px solid transparent;
+      background-clip: content-box;
+    }
+
+    .scroll-area::-webkit-scrollbar-thumb:hover { background: #4f4f4f; background-clip: content-box; }
+
+    @media (max-width: 1023px) {
+      .scroll-area { overflow: visible; }
+    }
+
+    /* ---------- stats panel ---------- */
+    .stat-panel { display: flex; flex-direction: column; }
+
+    .stat-row {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.45rem 1.6rem;
+      min-height: 6rem;
+    }
+
+    .stat-row + .stat-row { border-top: 1px solid var(--line); }
+
+    .stat-num {
+      font-weight: 300;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(2.5rem, 4.2vw, 3.35rem);
+    }
+
+    @media (max-width: 1023px) {
+      .stat-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat-row { min-height: 0; padding: 1.05rem 1.15rem; border-top: 0 !important; }
+      .stat-row:nth-child(odd) { border-right: 1px solid var(--line); }
+      .stat-row:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+      .stat-num { font-size: 2.15rem; }
+    }
+
+    /* ---------- controls ---------- */
+    select.field {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 2.4rem;
+      cursor: pointer;
+    }
+
+    select.field option { background: #141414; color: var(--text); }
+
+    .mini-seg {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--faint);
+      padding: 0.18rem 0.55rem;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1.4;
+    }
+
+    .mini-seg:hover { color: var(--text); }
+
+    .mini-seg.is-on {
+      background: var(--invert);
+      border-color: var(--invert);
+      color: var(--invert-text);
+    }
+
+    .add-btn {
+      background: transparent;
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      width: 100%;
+      padding: 1rem;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+
+    .add-btn:hover { color: var(--text); border-color: #3d3d3d; background: var(--surface); }
+
+    .course {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 1.1rem;
+    }
+
+    .label {
+      color: var(--faint);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .stat-val {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
+    }
+
+    ::selection {
+      background: #f3f3f3;
+      color: #0b0b0b;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    const LETTERS = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"];
+
+    const LETTER_POINTS = {
+      "A+": 4.0, "A": 4.0, "A-": 3.7,
+      "B+": 3.3, "B": 3.0, "B-": 2.7,
+      "C+": 2.3, "C": 2.0, "C-": 1.7,
+      "D+": 1.3, "D": 1.0, "D-": 0.7,
+      "F": 0.0
+    };
+
+    const TYPES = [
+      { id: "onlevel", label: "On Level" },
+      { id: "honors", label: "Honors" },
+      { id: "ap", label: "AP / IB" }
+    ];
+
+    function percentToLetter(score) {
+      const n = Number(score);
+      if (Number.isNaN(n)) return null;
+      if (n >= 97) return "A+";
+      if (n >= 93) return "A";
+      if (n >= 90) return "A-";
+      if (n >= 87) return "B+";
+      if (n >= 83) return "B";
+      if (n >= 80) return "B-";
+      if (n >= 77) return "C+";
+      if (n >= 73) return "C";
+      if (n >= 70) return "C-";
+      if (n >= 67) return "D+";
+      if (n >= 63) return "D";
+      if (n >= 60) return "D-";
+      return "F";
+    }
+
+    function letterFromCourse(course) {
+      if (course.mode === "score") return percentToLetter(course.score);
+      return course.letter;
+    }
+
+    function pointsFor(course) {
+      const letter = letterFromCourse(course);
+      if (!letter) return null;
+      let pts = LETTER_POINTS[letter];
+      if (course.type === "ap" && pts > 0) pts += 1;
+      return pts;
+    }
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 9);
+    }
+
+    function chevronDown() {
+      const node = el("span", {
+        class: "pointer-events-none absolute right-3.5 bottom-[0.72rem] text-[#8a8a8a]",
+        "aria-hidden": "true"
+      });
+      node.innerHTML =
+        '<svg width="10" height="6" viewBox="0 0 10 6" fill="none">' +
+        '<path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" ' +
+        'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      return node;
+    }
+
+    function createCourse() {
+      return {
+        id: uid(),
+        name: "",
+        credits: 1,
+        type: "onlevel",
+        mode: "letter",
+        letter: "A",
+        score: ""
+      };
+    }
+
+    function el(tag, attrs = {}, children = []) {
+      const node = document.createElement(tag);
+      for (const [key, value] of Object.entries(attrs)) {
+        if (value == null || value === false) continue;
+        if (key === "class") node.className = value;
+        else if (key === "dataset") Object.assign(node.dataset, value);
+        else if (key.startsWith("on") && typeof value === "function") {
+          node.addEventListener(key.slice(2).toLowerCase(), value);
+        } else if (key === "style" && typeof value === "object") {
+          Object.assign(node.style, value);
+        } else if (value === true) node.setAttribute(key, "");
+        else node.setAttribute(key, value);
+      }
+      for (const child of [].concat(children)) {
+        if (child == null || child === false) continue;
+        node.append(child.nodeType ? child : document.createTextNode(child));
+      }
+      return node;
+    }
+
+    const STORAGE_KEY = "gpa.courses.v1";
+
+    class Store {
+      constructor() {
+        const restored = Store.load();
+        this.courses = restored && Array.isArray(restored.courses) && restored.courses.length
+          ? restored.courses
+          : [createCourse(), createCourse(), createCourse()];
+        this.restoredAt = restored ? restored.savedAt : null;
+        this.subs = [];
+      }
+
+      static load() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          if (!parsed || !Array.isArray(parsed.courses)) return null;
+          return {
+            savedAt: parsed.savedAt || null,
+            courses: parsed.courses.map((c) => ({
+              ...createCourse(),
+              ...c,
+              id: c.id || uid()
+            }))
+          };
+        } catch (err) {
+          return null;
+        }
+      }
+
+      save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            v: 1,
+            savedAt: Date.now(),
+            courses: this.courses
+          }));
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      subscribe(fn) {
+        this.subs.push(fn);
+        return () => {
+          this.subs = this.subs.filter((s) => s !== fn);
+        };
+      }
+
+      emit() {
+        this.subs.forEach((fn) => fn(this.courses));
+      }
+
+      add() {
+        this.courses = [...this.courses, createCourse()];
+        this.emit();
+      }
+
+      remove(id) {
+        this.courses = this.courses.filter((c) => c.id !== id);
+        this.emit();
+      }
+
+      update(id, patch) {
+        this.courses = this.courses.map((c) => (c.id === id ? { ...c, ...patch } : c));
+        this.emit();
+      }
+
+      reset() {
+        this.courses = [createCourse(), createCourse(), createCourse()];
+        this.emit();
+      }
+
+      get(id) {
+        return this.courses.find((c) => c.id === id);
+      }
+    }
+
+    class GPA {
+      static compute(courses) {
+        let wPoints = 0;
+        let uPoints = 0;
+        let credits = 0;
+        let counted = 0;
+
+        for (const course of courses) {
+          const cr = Number(course.credits);
+          const pts = pointsFor(course);
+          if (!cr || cr <= 0 || pts == null) continue;
+          const letter = letterFromCourse(course);
+          const unweighted = LETTER_POINTS[letter];
+          wPoints += pts * cr;
+          uPoints += unweighted * cr;
+          credits += cr;
+          counted += 1;
+        }
+
+        return {
+          weighted: credits ? wPoints / credits : null,
+          unweighted: credits ? uPoints / credits : null,
+          credits,
+          counted
+        };
+      }
+
+      static fmt(n) {
+        return n == null ? "—" : n.toFixed(2);
+      }
+    }
+
+    class Component {
+      constructor(props = {}) {
+        this.props = props;
+        this.root = null;
+      }
+
+      mount(parent) {
+        this.root = this.render();
+        parent.append(this.root);
+        return this.root;
+      }
+
+      render() {
+        throw new Error("render() not implemented");
+      }
+    }
+
+    class StatsPanel extends Component {
+      constructor(store) {
+        super();
+        this.store = store;
+        this.store.subscribe(() => this.refresh());
+      }
+
+      render() {
+        this.weightedEl = el("div", { class: "stat-num" }, "—");
+        this.unweightedEl = el("div", { class: "stat-num" }, "—");
+        this.coursesEl = el("div", { class: "stat-num" }, "0");
+        this.creditsEl = el("div", { class: "stat-num" }, "0");
+
+        const row = (label, node) =>
+          el("div", { class: "stat-row" }, [
+            el("div", { class: "label mb-2" }, label),
+            node
+          ]);
+
+        this.root = el("aside", { class: "panel stat-panel lg:h-full" }, [
+          row("weighted gpa", this.weightedEl),
+          row("unweighted gpa", this.unweightedEl),
+          row("courses", this.coursesEl),
+          row("credits", this.creditsEl)
+        ]);
+
+        this.refresh();
+        return this.root;
+      }
+
+      refresh() {
+        if (!this.weightedEl) return;
+        const { weighted, unweighted, credits, counted } = GPA.compute(this.store.courses);
+        this.weightedEl.textContent = GPA.fmt(weighted);
+        this.unweightedEl.textContent = GPA.fmt(unweighted);
+        this.coursesEl.textContent = String(counted);
+        this.creditsEl.textContent = credits ? String(Number(credits.toFixed(2))) : "0";
+      }
+    }
+
+    class CourseItem extends Component {
+      constructor(course, store) {
+        super();
+        this.course = course;
+        this.store = store;
+      }
+
+      patch(partial) {
+        this.store.update(this.course.id, partial);
+        this.course = this.store.get(this.course.id);
+        this.sync();
+      }
+
+      render() {
+        this.nameInput = el("input", {
+          class: "field squircle-sm",
+          type: "text",
+          placeholder: "Course name",
+          maxlength: "48",
+          value: this.course.name,
+          "aria-label": "Course name",
+          onInput: (e) => this.patch({ name: e.target.value })
+        });
+
+        this.creditInput = el("input", {
+          class: "field squircle-sm text-center",
+          type: "number",
+          min: "0",
+          max: "10",
+          step: "0.5",
+          value: this.course.credits,
+          "aria-label": "Credits",
+          onInput: (e) => this.patch({ credits: e.target.value === "" ? "" : Number(e.target.value) })
+        });
+
+        this.typeBtns = TYPES.map((t) =>
+          el("button", {
+            type: "button",
+            class: "seg squircle-xs flex-1 py-2 text-[0.78rem] font-medium",
+            dataset: { type: t.id },
+            onClick: () => this.patch({ type: t.id })
+          }, t.label)
+        );
+
+        this.modeLetterBtn = el("button", {
+          type: "button",
+          class: "mini-seg squircle-xs",
+          onClick: () => this.patch({ mode: "letter" })
+        }, "Letter");
+
+        this.modeScoreBtn = el("button", {
+          type: "button",
+          class: "mini-seg squircle-xs",
+          onClick: () => this.patch({ mode: "score" })
+        }, "Score");
+
+        this.gradeSelect = el("select", {
+          class: "field squircle-sm",
+          "aria-label": "Letter grade",
+          onChange: (e) => this.patch({ letter: e.target.value, mode: "letter" })
+        }, LETTERS.map((letter) => el("option", { value: letter }, letter)));
+
+        this.scoreInput = el("input", {
+          class: "field squircle-sm text-center",
+          type: "number",
+          min: "0",
+          max: "100",
+          step: "0.1",
+          placeholder: "0–100",
+          value: this.course.score,
+          "aria-label": "Score out of 100",
+          onInput: (e) => this.patch({ score: e.target.value, mode: "score" })
+        });
+
+        this.letterHint = el("span", { class: "text-[#8a8a8a] text-sm" }, "");
+        this.pointsEl = el("span", { class: "stat-val text-sm text-[#8a8a8a]" }, "");
+
+        this.gradeField = el("div", { class: "relative" }, [this.gradeSelect, chevronDown()]);
+        this.scoreField = el("div", {}, [
+          this.scoreInput,
+          el("div", { class: "flex items-center gap-1.5 mt-1.5" }, [
+            el("span", { class: "label" }, "letter"),
+            el("span", { class: "text-sm text-[#8a8a8a]" }, this.letterHint)
+          ])
+        ]);
+
+        const cell = (label, extra, node, cls) =>
+          el("div", { class: cls || "" }, [
+            el("div", { class: "flex items-center justify-between gap-2 mb-1.5 min-h-[1.1rem]" }, [
+              el("div", { class: "label" }, label),
+              extra || null
+            ]),
+            node
+          ]);
+
+        this.root = el("article", { class: "course squircle" }, [
+          el("div", { class: "flex gap-2 items-center" }, [
+            this.nameInput,
+            el("button", {
+              type: "button",
+              class: "icon-btn squircle-sm",
+              "aria-label": "Remove course",
+              onClick: () => this.store.remove(this.course.id)
+            }, "×")
+          ]),
+          el("div", { class: "mt-4 flex flex-wrap gap-x-4 gap-y-4 items-end" }, [
+            el("div", { class: "basis-[4.5rem] grow-0" }, [
+              el("div", { class: "label mb-1.5" }, "Credits"),
+              this.creditInput
+            ]),
+            el("div", { class: "basis-[15rem] grow" }, [
+              el("div", { class: "label mb-1.5" }, "Type"),
+              el("div", { class: "flex gap-1.5" }, this.typeBtns)
+            ]),
+            cell("Grade", el("div", { class: "flex gap-1" }, [this.modeLetterBtn, this.modeScoreBtn]),
+              el("div", {}, [this.gradeField, this.scoreField]), "basis-[10rem] grow-0")
+          ]),
+          el("div", { class: "mt-3 flex justify-end" }, this.pointsEl)
+        ]);
+
+        this.sync();
+        return this.root;
+      }
+
+      sync() {
+        const c = this.course;
+        this.typeBtns.forEach((btn) => btn.classList.toggle("is-on", btn.dataset.type === c.type));
+        this.modeLetterBtn.classList.toggle("is-on", c.mode === "letter");
+        this.modeScoreBtn.classList.toggle("is-on", c.mode === "score");
+        this.gradeField.hidden = c.mode !== "letter";
+        this.scoreField.hidden = c.mode !== "score";
+        if (document.activeElement !== this.gradeSelect) this.gradeSelect.value = c.letter || "A";
+
+        const letter = letterFromCourse(c);
+        const pts = pointsFor(c);
+        this.letterHint.textContent = letter || "—";
+        if (pts == null) this.pointsEl.textContent = "";
+        else {
+          const scale = c.type === "ap" ? "5.0" : "4.0";
+          this.pointsEl.textContent = `${pts.toFixed(2)} · ${scale} scale`;
+        }
+      }
+    }
+
+    class CourseList extends Component {
+      constructor(store) {
+        super();
+        this.store = store;
+        this.items = new Map();
+        this.ready = false;
+        this.store.subscribe(() => this.sync());
+      }
+
+      render() {
+        this.listEl = el("div", { class: "flex flex-col gap-3" });
+        this.emptyEl = el("p", { class: "text-center text-[#8a8a8a] text-sm py-6" }, "No courses yet.");
+        this.root = el("section", {}, [this.listEl, this.emptyEl]);
+        this.sync();
+        this.ready = true;
+        return this.root;
+      }
+
+      sync() {
+        if (!this.listEl) return;
+        const ids = new Set(this.store.courses.map((c) => c.id));
+
+        for (const [id, item] of this.items) {
+          if (!ids.has(id)) {
+            item.root.remove();
+            this.items.delete(id);
+          }
+        }
+
+        let lastAdded = null;
+        for (const course of this.store.courses) {
+          if (!this.items.has(course.id)) {
+            const item = new CourseItem(course, this.store);
+            item.mount(this.listEl);
+            this.items.set(course.id, item);
+            lastAdded = item;
+          }
+        }
+
+        if (lastAdded && this.ready) {
+          lastAdded.root.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+
+        this.emptyEl.hidden = this.store.courses.length > 0;
+      }
+    }
+
+    class SaveBar extends Component {
+      constructor(store) {
+        super();
+        this.store = store;
+        this.dirty = false;
+        this.store.subscribe(() => {
+          this.dirty = true;
+          this.renderStatus();
+        });
+        this.onOnline = () => this.renderStatus();
+        this.onOffline = () => this.renderStatus();
+        this.onKey = (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+            e.preventDefault();
+            this.save();
+          }
+        };
+      }
+
+      save() {
+        const ok = this.store.save();
+        if (!ok) {
+          this.dirty = true;
+          this.renderStatus("Storage unavailable");
+          return;
+        }
+        this.dirty = false;
+        const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        this.renderStatus("Saved · " + time);
+        this.saveBtn.classList.add("is-saved");
+        clearTimeout(this._flash);
+        this._flash = setTimeout(() => this.saveBtn.classList.remove("is-saved"), 1100);
+      }
+
+      renderStatus(forced) {
+        if (!this.statusEl) return;
+        if (typeof navigator !== "undefined" && navigator.onLine === false) {
+          this.statusEl.textContent = "Offline · saved locally";
+          this.dot.classList.add("is-live");
+          return;
+        }
+        this.dot.classList.remove("is-live");
+        if (forced) {
+          this.statusEl.textContent = forced;
+        } else if (this.dirty) {
+          this.statusEl.textContent = "Unsaved changes";
+        } else if (this.store.restoredAt) {
+          const d = new Date(this.store.restoredAt);
+          this.statusEl.textContent = "Restored · " + d.toLocaleDateString([], { month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        } else {
+          this.statusEl.textContent = "Nothing saved yet";
+        }
+      }
+
+      render() {
+        this.statusEl = el("span", { class: "text-[0.74rem] tracking-[0.06em] text-[#8a8a8a] truncate" }, "");
+        this.dot = el("span", { class: "status-dot" });
+        this.saveBtn = el("button", {
+          type: "button",
+          class: "save-btn squircle-sm whitespace-nowrap",
+          onClick: () => this.save()
+        }, "Save classes");
+
+        this.root = el("div", { class: "flex items-center gap-2 min-w-0" }, [
+          this.dot,
+          this.statusEl
+        ]);
+
+        this.renderStatus();
+        window.addEventListener("online", this.onOnline);
+        window.addEventListener("offline", this.onOffline);
+        document.addEventListener("keydown", this.onKey);
+        return this.root;
+      }
+    }
+
+    class App extends Component {
+      constructor(store) {
+        super();
+        this.store = store;
+      }
+
+      render() {
+        const saveBar = new SaveBar(this.store);
+        const stats = new StatsPanel(this.store);
+        const list = new CourseList(this.store);
+
+        saveBar.render();
+
+        const add = el("button", {
+          type: "button",
+          class: "add-btn squircle mt-4",
+          onClick: () => this.store.add()
+        }, "+  Add course");
+
+        const reset = el("button", {
+          type: "button",
+          class: "ghost squircle-sm px-3 py-2 whitespace-nowrap",
+          onClick: () => this.store.reset()
+        }, "Reset");
+
+        const topBar = el("header", {
+          class: "flex items-center justify-between gap-4 px-5 lg:px-6 pt-5 lg:pt-6 pb-4",
+          style: { paddingTop: "max(1.25rem, env(safe-area-inset-top))" }
+        }, [
+          el("div", { class: "min-w-0" }, [
+            el("div", { class: "label mb-1" }, "GPA Calculator"),
+            saveBar.root
+          ]),
+          el("div", { class: "flex items-center gap-1 shrink-0" }, [
+            reset,
+            saveBar.saveBtn
+          ])
+        ]);
+
+        const columns = el("div", {
+          class: "flex-1 min-h-0 grid gap-4 px-5 lg:px-6 lg:grid-cols-[19.5rem_minmax(0,1fr)]"
+        }, [
+          stats.render(),
+          el("section", { class: "scroll-area min-h-0 -mr-2 pr-2 lg:-mr-3 lg:pr-3" }, [
+            list.render(),
+            add,
+            el("p", { class: "text-center text-[0.72rem] text-[#5c5c5c] leading-relaxed mt-6" },
+              "On Level and Honors use a 4.0 scale. AP and IB use a 5.0 scale. A and A+ both cap at the scale maximum.")
+          ])
+        ]);
+
+        this.root = el("div", { class: "app-shell" }, [
+          topBar,
+          el("div", {
+            class: "flex-1 min-h-0",
+            style: { paddingBottom: "env(safe-area-inset-bottom)" }
+          }, columns)
+        ]);
+
+        return this.root;
+      }
+    }
+
+    const store = new Store();
+    const app = new App(store);
+    app.mount(document.getElementById("app"));
+
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
